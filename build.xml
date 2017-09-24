@@ -1,0 +1,65 @@
+<project name="Calculator" basedir="." default="run">
+
+    <property name="src.dir"  value="./src"/>
+    <property name="build.dir" value="./classes"/>
+    <property name="classes.dir" value="./classes"/>
+    <property name="jar.dir"   value="${build.dir}/jar"/>
+    <property name="client-class"  value="com.test.calc.Client"/>
+    <property name="server-class" value="com.test.calc.Server"/>
+    <property name="junit" value="lib/junit-4.12.jar"/>
+
+    <property name="lib.dir"  value="${basedir}/lib"/>
+
+    <path id="classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+
+    <path id = "classpath.test">
+        <pathelement location = "${junit}" />
+        <pathelement location = "${src.dir}" />
+        <path refid = "classpath" />
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile" depends="clean">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" includeantruntime="false"/>
+    </target>
+
+    <target name="build" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/Client.jar" basedir="${classes.dir}">
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar" />
+            </fileset>
+            <manifest>
+                <attribute name="Main-Class" value="${client-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="build">
+        <java fork="true" classname="${client-class}">
+            <classpath>
+                <path refid="classpath"/>
+                <path location="${jar.dir}/Client.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="test" depends="compile">
+        <junit printsummary="on" fork="true" showoutput="true">
+            <classpath path="${classes.dir}">
+                <path refid="classpath" />
+            </classpath>
+            <formatter type="brief" usefile="false"/>
+            <test name="test_class.CalculatorTest"/>
+        </junit>
+    </target>
+
+</project>
