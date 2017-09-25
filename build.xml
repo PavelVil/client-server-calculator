@@ -34,22 +34,44 @@
     <target name="build" depends="compile">
         <mkdir dir="${jar.dir}"/>
         <jar destfile="${jar.dir}/Client.jar" basedir="${classes.dir}">
-            <fileset dir="${lib.dir}">
-                <include name="**/*.jar" />
+            <fileset dir="lib">
+                <include name="junit-4.12.jar" />
+                <include name="MathParser.org-mXparser-4.1.1.jar"/>
             </fileset>
             <manifest>
                 <attribute name="Main-Class" value="${client-class}"/>
             </manifest>
         </jar>
+        <jar destfile="${jar.dir}/Server.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${server-class}"/>
+            </manifest>
+        </jar>
     </target>
 
+    <!--<target name="run" depends="build">-->
+        <!--<java fork="true" classname="${client-class}">-->
+            <!--<classpath>-->
+                <!--<path refid="classpath"/>-->
+                <!--<path location="${jar.dir}/Client.jar"/>-->
+            <!--</classpath>-->
+        <!--</java>-->
+    <!--</target>-->
+
     <target name="run" depends="build">
-        <java fork="true" classname="${client-class}">
-            <classpath>
-                <path refid="classpath"/>
-                <path location="${jar.dir}/Client.jar"/>
-            </classpath>
-        </java>
+        <java jar="${jar.dir}/Server.jar" fork="true"/>
+
+        <waitfor maxwait="5" maxwaitunit="second" timeoutproperty="failtimeout">
+            <!--<socket server="localhost" port="8189"/>-->
+        </waitfor>
+        <if>
+            <not>
+                <equals arg1="${failtimeout}" arg2="true"/>
+            </not>
+            <then>
+                <java jar="${jar.dir}/Client.jar" fork="true"/>
+            </then>
+        </if>
     </target>
 
     <target name="test" depends="compile">
