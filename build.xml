@@ -62,16 +62,11 @@
         <java jar="${jar.dir}/Server.jar" fork="true"/>
 
         <waitfor maxwait="5" maxwaitunit="second" timeoutproperty="failtimeout">
-            <!--<socket server="localhost" port="8189"/>-->
+            <socket server="localhost" port="8189"/>
         </waitfor>
-        <if>
-            <not>
-                <equals arg1="${failtimeout}" arg2="true"/>
-            </not>
-            <then>
+
                 <java jar="${jar.dir}/Client.jar" fork="true"/>
-            </then>
-        </if>
+
     </target>
 
     <target name="test" depends="compile">
