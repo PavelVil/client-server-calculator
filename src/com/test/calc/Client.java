@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.io.*;
 
 public class Client extends JFrame implements ActionListener, TCPConnectionListener {
 
@@ -31,6 +31,7 @@ public class Client extends JFrame implements ActionListener, TCPConnectionListe
     private final JTextArea log = new JTextArea();
     private final JTextField fieldInput = new JTextField();
 
+
     public Client(String host, int port) {
 
         this.port = port;
@@ -48,6 +49,8 @@ public class Client extends JFrame implements ActionListener, TCPConnectionListe
         add(fieldInput, BorderLayout.SOUTH);
         add(new JScrollPane(log), BorderLayout.CENTER);
 
+        setIO();
+
         setVisible(true);
 
         try {
@@ -59,10 +62,9 @@ public class Client extends JFrame implements ActionListener, TCPConnectionListe
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String msg = fieldInput.getText();
-        if (msg.equals("")) return;
+        String msq = fieldInput.getText();
         fieldInput.setText("");
-        connection.sendString(msg + " = " + Calculator.calculate(msg));
+        connection.sendString(msq + "=" + Calculator.calculate(msq));
     }
 
 
@@ -90,5 +92,19 @@ public class Client extends JFrame implements ActionListener, TCPConnectionListe
                 log.setCaretPosition(log.getDocument().getLength());
             }
         });
+    }
+
+    private void setIO() {
+        PrintStream textAreaOut = new PrintStream(new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+                log.append(String.valueOf((char) b));
+            }
+        });
+        PipedInputStream pipedInputStream = new PipedInputStream();
+
+        System.setOut(textAreaOut);
+        System.setIn(pipedInputStream);
+
     }
 }
