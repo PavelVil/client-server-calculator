@@ -1,5 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="Calculator" basedir="." default="run">
 
+    <!--<taskdef resource="net/sf/antcontrib/antlib.xml" uri="http://ant-contrib.sourceforge.net">-->
+    <!--<classpath>-->
+        <!--<pathelement location="lib/ant-contrib-1.0b3.jar"/>-->
+    <!--</classpath>-->
+<!--</taskdef>-->
     <property name="src.dir"  value="./src"/>
     <property name="build.dir" value="./classes"/>
     <property name="classes.dir" value="./classes"/>
@@ -50,24 +56,29 @@
     </target>
 
     <!--<target name="run" depends="build">-->
-        <!--<java fork="true" classname="${client-class}">-->
-            <!--<classpath>-->
-                <!--<path refid="classpath"/>-->
-                <!--<path location="${jar.dir}/Client.jar"/>-->
-            <!--</classpath>-->
-        <!--</java>-->
+
+        <!--<java jar="${jar.dir}/Server.jar" fork="true"/>-->
+
+        <!--<waitfor maxwait="2" maxwaitunit="second" timeoutproperty="failtimeout">-->
+            <!--<socket server="localhost" port="8189"/>-->
+        <!--</waitfor>-->
+
+        <!--<java jar="${jar.dir}/Client.jar" fork="true"/>-->
+
     <!--</target>-->
 
     <target name="run" depends="build">
+        <parallel>
         <java jar="${jar.dir}/Server.jar" fork="true"/>
 
-        <waitfor maxwait="5" maxwaitunit="second" timeoutproperty="failtimeout">
+        <waitfor maxwait="5" maxwaitunit="seconds" timeoutproperty="failtimeout">
             <socket server="localhost" port="8189"/>
         </waitfor>
 
-                <java jar="${jar.dir}/Client.jar" fork="true"/>
-
+        <java jar="${jar.dir}/Client.jar" fork="true"/>
+    </parallel>
     </target>
+
 
     <target name="test" depends="compile">
         <junit printsummary="on" fork="true" showoutput="true">
