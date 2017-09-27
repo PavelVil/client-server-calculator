@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Calculator" basedir="." default="run">
 
-    <property name="src.dir"  value="./src"/>
-    <property name="build.dir" value="./classes"/>
-    <property name="classes.dir" value="./classes"/>
-    <property name="jar.dir"   value="${build.dir}/jar"/>
+    <property name="src.dir"  location="./src"/>
+    <property name="build.dir" location="./classes"/>
+    <property name="classes.dir" location="./classes"/>
+    <property name="jar.dir"   location="${build.dir}/jar"/>
     <property name="client-class"  value="com.test.calc.Client"/>
     <property name="server-class" value="com.test.calc.Server"/>
-    <property name="junit" value="lib/junit-4.12.jar"/>
-
-    <property name="lib.dir"  value="${basedir}/lib"/>
+    <property name="lib.dir"  location="${basedir}/lib"/>
 
 
     <path id="classpath">
@@ -39,35 +37,40 @@
     <target name="build" depends="compile">
         <mkdir dir="${jar.dir}"/>
         <jar destfile="${jar.dir}/Client.jar" basedir="${classes.dir}">
-                <manifest>
-            <attribute name="Main-Class" value="${client-class}"/>
-        </manifest>
+            <manifest>
+                <attribute name="Main-Class" value="${client-class}"/>
+            </manifest>
+            <zipgroupfileset dir="lib" includes="*.jar"/>
         </jar>
 
         <jar destfile="${jar.dir}/Server.jar" basedir="${classes.dir}">
             <manifest>
                 <attribute name="Main-Class" value="${server-class}"/>
             </manifest>
+            <zipgroupfileset dir="lib" includes="*.jar"/>
         </jar>
     </target>
 
-
     <target name="run" depends="build">
         <parallel>
-            <java jar="${jar.dir}/Server.jar" fork="true" classpath="classpath">
-
+            <java classname="${server-class}" fork="true" >
+                <classpath>
+                    <path refid="classpath"/>
+                    <path location="${jar.dir}/Server.jar"/>
+                </classpath>
             </java>
 
             <!--<waitfor maxwait="5" maxwaitunit="second" timeoutproperty="failtimeout">-->
-                <!--<socket server="localhost" port="8189"/>-->
+            <!--<socket server="localhost" port="8189"/>-->
             <!--</waitfor>-->
 
-        <java jar="${jar.dir}/Client.jar" fork="true" classpath="classpath">
-
-
-        </java>
-
-    </parallel>
+            <java classname="${client-class}" fork="true" >
+                <classpath>
+                    <path refid="classpath"/>
+                    <path location="${jar.dir}/Client.jar"/>
+                </classpath>
+            </java>
+        </parallel>
     </target>
 
 

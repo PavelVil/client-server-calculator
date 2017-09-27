@@ -49,8 +49,6 @@ public class Client extends JFrame implements ActionListener, TCPConnectionListe
         add(fieldInput, BorderLayout.SOUTH);
         add(new JScrollPane(log), BorderLayout.CENTER);
 
-        setIO();
-
         setVisible(true);
 
         try {
@@ -92,19 +90,5 @@ public class Client extends JFrame implements ActionListener, TCPConnectionListe
                 log.setCaretPosition(log.getDocument().getLength());
             }
         });
-    }
-
-    private void setIO() {
-        PrintStream textAreaOut = new PrintStream(new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                log.append(String.valueOf((char) b));
-            }
-        });
-        PipedInputStream pipedInputStream = new PipedInputStream();
-
-        System.setOut(textAreaOut);
-        System.setIn(pipedInputStream);
-
     }
 }
